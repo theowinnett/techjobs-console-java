@@ -4,6 +4,9 @@ import com.sun.org.apache.xpath.internal.functions.FuncFalse;
 
 import java.util.*;
 
+import static org.launchcode.techjobs.console.JobData.allJobs;
+import static org.launchcode.techjobs.console.JobData.loadData;
+
 /**
  * Created by LaunchCode
  */
@@ -68,28 +71,9 @@ public class TechJobs {
             }
         }
     }
-    private static ArrayList<HashMap<String, String>> findByValue(String searchterm) {
-
-        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-
-        for (HashMap<String, String> row : JobData.findAll()) {
-
-            if (row.containsValue(searchterm)) {
-                jobs.add(row);
-            }
 
 
-        }
-        for (HashMap<String, String> row : JobData.findAll()) {
 
-            if (!row.containsValue(searchterm)) {
-                System.out.println("Search term: " + searchterm + " not found.");
-                break;
-            }
-
-        }
-        return jobs;
-    }
     // ﻿Returns the key of the selected item from the choices Dictionary
     private static String getUserSelection(String menuHeader, HashMap<String, String> choices) {
 
@@ -128,14 +112,37 @@ public class TechJobs {
 
         return choiceKeys[choiceIdx];
     }
-
+    public static ArrayList<HashMap<String, String>> findByValue (String searchTerm) {
+        loadData();
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+        for (HashMap<String, String> job : allJobs) {
+            Boolean containsTerm = false;
+            for (Map.Entry<String, String> row : job.entrySet()) {
+                String original_value = row.getValue();
+                String value = original_value.toLowerCase();
+                if (value.contains(searchTerm)) {
+                    containsTerm = true;
+                    break;
+                }
+            }
+            if (containsTerm == true) {
+                jobs.add(job);
+            }
+        }
+        return jobs;
+    }
     // Print a list of jobs
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
-        for (java.util.HashMap<java.lang.String, java.lang.String> job : someJobs) {
-            System.out.println("********");
-            List<String> keys = new ArrayList<>(job.keySet());
-            for (String key : keys) {
-                System.out.println(key + ": " + job.get(key));
+        if (someJobs.isEmpty()) {
+            System.out.println("Search term not found.");
+        } else {
+            for (java.util.HashMap<java.lang.String, java.lang.String> job : someJobs) {
+
+                System.out.println("********");
+                List<String> keys = new ArrayList<>(job.keySet());
+                for (String key : keys) {
+                    System.out.println(key + ": " + job.get(key));
+                }
             }
         }
     }
